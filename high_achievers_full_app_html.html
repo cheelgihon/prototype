@@ -1,0 +1,1178 @@
+
+<!DOCTYPE html>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0A0A0F;--surface:#13131A;--card:#1A1A24;--border:rgba(255,255,255,0.08);
+  --text:#F0F0F8;--muted:#7A7A9A;--purple:#6C63FF;--pink:#FF6B9D;
+  --gold:#FFB800;--green:#00E096;--blue:#38BDF8;--orange:#FF8C42;
+  --r:14px;--rs:10px;
+}
+body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+.phone{max-width:420px;margin:0 auto;background:var(--bg);min-height:100vh;display:flex;flex-direction:column;position:relative}
+.screen{display:none;flex-direction:column;flex:1;overflow:hidden}
+.screen.active{display:flex}
+.scroll{flex:1;overflow-y:auto;padding:16px}
+.scroll::-webkit-scrollbar{width:3px}
+.scroll::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 16px 10px;background:var(--surface);border-bottom:1px solid var(--border);flex-shrink:0}
+.logo{font-size:18px;font-weight:800;background:linear-gradient(135deg,#6C63FF,#FF6B9D);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.streak-pill{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:var(--gold)}
+.xp-pill{background:rgba(108,99,255,0.15);border:1px solid rgba(108,99,255,0.3);color:#A89BFF;padding:4px 10px;border-radius:20px;font-size:12px;font-weight:600}
+
+.nav{display:flex;background:var(--surface);border-top:1px solid var(--border);padding:8px 0 14px;flex-shrink:0}
+.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;background:none;border:none;cursor:pointer;color:var(--muted);font-family:'Outfit',sans-serif;font-size:10px;font-weight:500;padding:6px 4px;transition:color .2s}
+.nav-btn.active{color:var(--purple)}
+.nav-dot{width:4px;height:4px;border-radius:2px;background:var(--purple);opacity:0;transition:opacity .2s}
+.nav-btn.active .nav-dot{opacity:1}
+.nav-icon{font-size:18px}
+
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:12px}
+.sec-label{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px}
+.badge{display:inline-flex;align-items:center;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600}
+.b-purple{background:rgba(108,99,255,.15);color:#A89BFF}
+.b-pink{background:rgba(255,107,157,.15);color:#FF9EC5}
+.b-gold{background:rgba(255,184,0,.15);color:#FFD060}
+.b-green{background:rgba(0,224,150,.15);color:#00E096}
+.b-blue{background:rgba(56,189,248,.15);color:#38BDF8}
+.b-orange{background:rgba(255,140,66,.15);color:#FF8C42}
+.pbar{background:rgba(255,255,255,.06);border-radius:20px;overflow:hidden}
+.pfill{height:100%;border-radius:20px;transition:width .6s ease}
+.p-purple{background:linear-gradient(90deg,#6C63FF,#FF6B9D)}
+.p-green{background:linear-gradient(90deg,#00E096,#38BDF8)}
+.p-gold{background:linear-gradient(90deg,#FFB800,#FF8C42)}
+
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;border:none;cursor:pointer;font-family:'Outfit',sans-serif;font-weight:700;border-radius:var(--rs);transition:all .2s;font-size:15px;width:100%;padding:13px 20px}
+.btn-primary{background:linear-gradient(135deg,#6C63FF,#8B7BFF);color:#fff}
+.btn-primary:hover{opacity:.9}
+.btn-outline{background:transparent;border:1.5px solid var(--border);color:var(--text);margin-top:10px}
+.btn-sm{padding:8px 14px;font-size:13px;border-radius:8px;width:auto}
+
+.hero-grad{background:linear-gradient(135deg,rgba(108,99,255,.2),rgba(255,107,157,.12));border:1px solid rgba(108,99,255,.25);border-radius:var(--r);padding:18px;margin-bottom:14px}
+.stat-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px}
+.stat-box{background:var(--card);border:1px solid var(--border);border-radius:var(--rs);padding:12px;text-align:center}
+.stat-val{font-size:18px;font-weight:800}
+.stat-lbl{font-size:10px;color:var(--muted);font-weight:500;margin-top:2px}
+
+.cat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.cat-card{border-radius:var(--rs);padding:14px;cursor:pointer;border:1.5px solid rgba(108,99,255,.2);background:linear-gradient(135deg,rgba(108,99,255,.15),rgba(108,99,255,.04));transition:transform .2s}
+.cat-card:hover{transform:translateY(-2px)}
+.cat-card.toefl{border-color:rgba(0,224,150,.2);background:linear-gradient(135deg,rgba(0,224,150,.15),rgba(0,224,150,.04))}
+.cat-card.sat{border-color:rgba(56,189,248,.2);background:linear-gradient(135deg,rgba(56,189,248,.15),rgba(56,189,248,.04))}
+.cat-card.hsk{border-color:rgba(255,107,157,.2);background:linear-gradient(135deg,rgba(255,107,157,.15),rgba(255,107,157,.04))}
+.cat-card.act{border-color:rgba(255,140,66,.2);background:linear-gradient(135deg,rgba(255,140,66,.15),rgba(255,140,66,.04))}
+
+.option{display:flex;align-items:center;gap:12px;padding:13px 14px;border-radius:var(--rs);border:1.5px solid var(--border);background:rgba(255,255,255,.03);cursor:pointer;margin-bottom:9px;transition:all .2s;font-size:14px;font-weight:500;color:var(--text)}
+.option:hover{border-color:var(--purple);background:rgba(108,99,255,.08)}
+.option.correct{border-color:var(--green);background:rgba(0,224,150,.08);color:var(--green)}
+.option.wrong{border-color:var(--pink);background:rgba(255,107,157,.08);color:var(--pink)}
+.opt-lbl{width:28px;height:28px;border-radius:50%;border:1.5px solid currentColor;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
+
+.modal-bg{display:none;position:absolute;inset:0;background:rgba(0,0,0,.75);z-index:50;align-items:flex-end;border-radius:inherit}
+.modal-bg.open{display:flex}
+.modal-sheet{background:var(--surface);border-radius:var(--r) var(--r) 0 0;width:100%;max-height:85%;overflow-y:auto;padding:18px 16px}
+.modal-handle{width:36px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 14px}
+
+.lb-podium{display:flex;align-items:flex-end;justify-content:center;gap:10px;height:160px;margin-bottom:20px}
+.podium-spot{display:flex;flex-direction:column;align-items:center;flex:1}
+.podium-base{width:100%;border-radius:8px 8px 0 0;display:flex;align-items:center;justify-content:center;font-size:18px}
+.lb-row{display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid var(--border)}
+.lb-me{background:rgba(108,99,255,.08);border-radius:10px;margin:2px 0}
+
+.week-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.day-col{display:flex;flex-direction:column;align-items:center;gap:4px}
+.day-circle{width:34px;height:34px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;border:1px solid}
+.milestone-row{display:flex;align-items:flex-start;gap:10px;margin-bottom:12px}
+.ms-dot{width:10px;height:10px;border-radius:50%;margin-top:3px;flex-shrink:0}
+
+.plan-stat-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px}
+.plan-stat{border-radius:var(--rs);padding:12px;text-align:center;border:1px solid}
+
+input[type=text],input[type=email]{background:var(--card);border:1px solid var(--border);border-radius:var(--rs);padding:12px 14px;color:var(--text);font-family:'Outfit',sans-serif;font-size:14px;width:100%;margin-bottom:16px;outline:none}
+input:focus{border-color:var(--purple)}
+
+.test-sel{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:14px;margin-bottom:10px;cursor:pointer;transition:all .2s}
+.test-sel.selected{border-color:var(--purple);background:rgba(108,99,255,.1)}
+
+.apt-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.apt-opt{background:var(--card);border:1.5px solid var(--border);border-radius:var(--rs);padding:14px;cursor:pointer;font-family:'Outfit',sans-serif;font-size:13px;font-weight:500;color:var(--text);transition:all .2s;text-align:left}
+.apt-opt:hover,.apt-opt.sel{border-color:var(--purple);background:rgba(108,99,255,.1);color:#A89BFF}
+
+.paywall-plan{flex:1;border-radius:var(--r);padding:16px;border:1.5px solid var(--border);background:var(--card);cursor:pointer;transition:all .2s;text-align:center}
+.paywall-plan.active{border-color:var(--gold);background:rgba(255,184,0,.08)}
+
+.xp-toast{position:absolute;top:120px;left:50%;transform:translateX(-50%) scale(0);background:linear-gradient(135deg,#6C63FF,#FF6B9D);color:#fff;padding:10px 20px;border-radius:20px;font-size:16px;font-weight:800;z-index:99;transition:transform .3s;pointer-events:none}
+.xp-toast.show{transform:translateX(-50%) scale(1)}
+</style>
+
+<div class="phone" id="app">
+<div class="xp-toast" id="xp-toast">+20 XP</div>
+
+<div class="topbar" id="topbar" style="display:none">
+  <span class="logo">High Achievers</span>
+  <div style="display:flex;gap:10px;align-items:center">
+    <span class="streak-pill">🔥 <span id="streak-disp">0</span></span>
+    <span class="xp-pill">⚡ <span id="xp-disp">0</span> XP</span>
+  </div>
+</div>
+
+<!-- ═══════════════════ ONBOARDING ═══════════════════ -->
+<div class="screen active" id="s-onboard">
+<div class="scroll" style="display:flex;flex-direction:column;justify-content:center;min-height:100vh;padding:32px 20px">
+  <div id="ob-step0">
+    <div style="text-align:center;margin-bottom:32px">
+      <div style="font-size:48px;margin-bottom:12px">🎓</div>
+      <div style="font-size:28px;font-weight:800;background:linear-gradient(135deg,#6C63FF,#FF6B9D);-webkit-background-clip:text;-webkit-text-fill-color:transparent">High Achievers</div>
+      <div style="font-size:14px;color:var(--muted);margin-top:6px">Your study abroad companion</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:32px">
+      <div class="card" style="margin:0">🧪 Placement test to know your starting point</div>
+      <div class="card" style="margin:0">📊 Personalized daily study plan</div>
+      <div class="card" style="margin:0">🏆 Gamified XP, streaks & leaderboard</div>
+      <div class="card" style="margin:0">🎓 University & scholarship explorer</div>
+    </div>
+    <button class="btn btn-primary" onclick="showObStep(1)">Get Started →</button>
+  </div>
+
+  <div id="ob-step1" style="display:none">
+    <div style="font-size:24px;font-weight:800;margin-bottom:6px">Create your profile</div>
+    <div style="font-size:13px;color:var(--muted);margin-bottom:24px">We'll personalize everything for you</div>
+    <div class="sec-label">Your name</div>
+    <input type="text" id="inp-name" placeholder="e.g. Alex Rahman">
+    <div class="sec-label">Email address</div>
+    <input type="email" id="inp-email" placeholder="you@email.com">
+    <button class="btn btn-primary" onclick="submitProfile()">Continue →</button>
+  </div>
+
+  <div id="ob-step2" style="display:none">
+    <div style="font-size:24px;font-weight:800;margin-bottom:6px">Which tests?</div>
+    <div style="font-size:13px;color:var(--muted);margin-bottom:20px">Select all that apply</div>
+    <div id="test-sel-list"></div>
+    <button class="btn btn-primary" onclick="startPlacement()" id="start-placement-btn">Start Placement Test →</button>
+  </div>
+</div>
+</div>
+
+<!-- ═══════════════════ PLACEMENT TEST ═══════════════════ -->
+<div class="screen" id="s-placement">
+<div style="padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;flex-shrink:0">
+  <div style="flex:1">
+    <div id="pt-label" style="font-size:12px;color:var(--muted);font-weight:600;margin-bottom:6px">IELTS · Q1/4</div>
+    <div class="pbar" style="height:4px"><div class="pfill p-purple" id="pt-prog" style="width:0%"></div></div>
+  </div>
+  <div style="background:rgba(255,184,0,.12);border-radius:8px;padding:6px 10px;font-size:13px;font-weight:700;color:var(--gold)" id="pt-timer">⏱ 0s</div>
+</div>
+<div class="scroll" id="pt-body"></div>
+</div>
+
+<!-- ═══════════════════ PLACEMENT RESULTS ═══════════════════ -->
+<div class="screen" id="s-placement-result">
+<div class="scroll" id="pr-body"></div>
+</div>
+
+<!-- ═══════════════════ TARGET SCORE ═══════════════════ -->
+<div class="screen" id="s-target">
+<div class="scroll" id="target-body"></div>
+</div>
+
+<!-- ═══════════════════ STUDY PLAN ═══════════════════ -->
+<div class="screen" id="s-plan">
+<div class="scroll" id="plan-body"></div>
+</div>
+
+<!-- ═══════════════════ PAYWALL ═══════════════════ -->
+<div class="screen" id="s-paywall">
+<div class="scroll" id="paywall-body"></div>
+</div>
+
+<!-- ═══════════════════ MAIN APP ═══════════════════ -->
+<div class="screen" id="s-main">
+  <!-- Home -->
+  <div id="tab-home" class="scroll" style="display:none"></div>
+  <!-- Drill -->
+  <div id="tab-drill" style="display:none;flex-direction:column;flex:1;overflow:hidden">
+    <div style="padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;flex-shrink:0">
+      <button onclick="closeTab('tab-drill')" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:20px">←</button>
+      <div style="flex:1">
+        <div id="drill-label" style="font-size:13px;font-weight:700;margin-bottom:5px">Practice</div>
+        <div class="pbar" style="height:3px"><div class="pfill p-purple" id="drill-prog" style="width:0%"></div></div>
+      </div>
+      <div style="background:rgba(255,184,0,.12);border-radius:8px;padding:5px 10px;font-size:13px;font-weight:700;color:var(--gold)" id="drill-timer">⏱ 0s</div>
+    </div>
+    <div class="scroll" id="drill-body"></div>
+  </div>
+  <!-- Leaderboard -->
+  <div id="tab-leaderboard" class="scroll" style="display:none"></div>
+  <!-- University -->
+  <div id="tab-university" class="scroll" style="display:none"></div>
+  <!-- Scholarships -->
+  <div id="tab-scholarships" class="scroll" style="display:none"></div>
+  <!-- Profile -->
+  <div id="tab-profile" class="scroll" style="display:none"></div>
+  <!-- Aptitude -->
+  <div id="tab-aptitude" style="display:none;flex-direction:column;flex:1;overflow:hidden">
+    <div style="padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;flex-shrink:0">
+      <button onclick="closeTab('tab-aptitude')" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:20px">←</button>
+      <div style="flex:1">
+        <div style="font-size:13px;font-weight:700;margin-bottom:5px">Major Aptitude Test</div>
+        <div class="pbar" style="height:3px"><div class="pfill p-purple" id="apt-prog" style="width:0%"></div></div>
+      </div>
+      <span class="badge b-purple" id="apt-qnum">1/10</span>
+    </div>
+    <div class="scroll" id="apt-body"></div>
+  </div>
+</div>
+
+<div class="nav" id="bottom-nav" style="display:none">
+  <button class="nav-btn active" id="nb-home" onclick="goTab('home')">
+    <span class="nav-icon">🏠</span><span>Home</span><div class="nav-dot"></div>
+  </button>
+  <button class="nav-btn" id="nb-leaderboard" onclick="goTab('leaderboard')">
+    <span class="nav-icon">📊</span><span>Ranks</span><div class="nav-dot"></div>
+  </button>
+  <button class="nav-btn" id="nb-university" onclick="goTab('university')">
+    <span class="nav-icon">🎓</span><span>Explore</span><div class="nav-dot"></div>
+  </button>
+  <button class="nav-btn" id="nb-scholarships" onclick="goTab('scholarships')">
+    <span class="nav-icon">💰</span><span>Funds</span><div class="nav-dot"></div>
+  </button>
+  <button class="nav-btn" id="nb-profile" onclick="goTab('profile')">
+    <span class="nav-icon">👤</span><span>Profile</span><div class="nav-dot"></div>
+  </button>
+</div>
+
+<!-- Modals -->
+<div class="modal-bg" id="modal-uni"><div class="modal-sheet" id="modal-uni-body"></div></div>
+<div class="modal-bg" id="modal-sch"><div class="modal-sheet" id="modal-sch-body"></div></div>
+</div>
+
+<script>
+const DATA={
+  tests:[
+    {id:'IELTS',emoji:'🇬🇧',name:'IELTS',sub:'English Proficiency',color:'#6C63FF'},
+    {id:'TOEFL',emoji:'🌐',name:'TOEFL',sub:'English Proficiency',color:'#00E096'},
+    {id:'SAT',emoji:'📐',name:'SAT',sub:'Math + English',color:'#38BDF8'},
+    {id:'ACT',emoji:'🧮',name:'ACT',sub:'Math + English + Science',color:'#FF8C42'},
+    {id:'HSK',emoji:'🇨🇳',name:'HSK',sub:'Mandarin Chinese',color:'#FF6B9D'},
+  ],
+  questions:{
+    IELTS:[
+      {q:'The passage argues urban heat islands occur mainly because of...',ctx:'Urban heat islands occur where cities are 2–5°C warmer than rural areas, primarily due to replacement of vegetation with concrete and asphalt that absorb solar radiation more efficiently.',opts:['Increased population density','Replacement of vegetation with heat-absorbing surfaces','Higher industrial pollution','More vehicles on roads'],correct:1,skill:'Reading',xp:20},
+      {q:'Choose the word closest in meaning to "proliferate":',ctx:'',opts:['Decline rapidly','Multiply or spread widely','Improve in quality','Become regulated'],correct:1,skill:'Vocabulary',xp:15},
+      {q:'Select the grammatically correct sentence:',ctx:'',opts:['Neither the students nor the teacher were present.','Neither the students nor the teacher was present.','Neither the students nor the teacher are present.','Neither the students nor the teacher have been present.'],correct:1,skill:'Grammar',xp:20},
+      {q:'What can be inferred about the author\'s view on renewable energy subsidies?',ctx:'Proponents argue subsidies correct market failures. Critics say they distort prices. Evidence from Germany and Denmark shows well-designed, time-limited subsidies catalyzed cost reductions now rendering solar/wind competitive.',opts:['Subsidies are always counterproductive','Subsidies can be effective when properly designed and temporary','Renewables can never compete without subsidies','Market forces alone are sufficient'],correct:1,skill:'Reading',xp:25},
+    ],
+    TOEFL:[
+      {q:'The word "seminal" in the passage most nearly means:',ctx:'Darwin\'s 1859 work is widely regarded as the most seminal contribution to evolutionary biology, reshaping how humans understand their place in the natural world.',opts:['Controversial and disputed','Highly influential and foundational','Difficult to comprehend','Recently published'],correct:1,skill:'Vocabulary',xp:20},
+      {q:'Which sentence uses the subjunctive mood correctly?',ctx:'',opts:['The professor suggested that he takes the exam again.','The professor suggested that he take the exam again.','The professor suggested that he will take the exam again.','The professor suggested that he would taking the exam again.'],correct:1,skill:'Grammar',xp:20},
+      {q:'The author\'s primary purpose in the passage is to:',ctx:'This review examines evidence across 47 studies on mindfulness interventions. While popular media often overstates benefits, controlled trials reveal modest but statistically significant improvements in anxiety and depression scores.',opts:['Promote mindfulness as a cure-all','Critically evaluate the evidence base for mindfulness','Discourage mindfulness practice','Explain how mindfulness works physiologically'],correct:1,skill:'Reading',xp:25},
+      {q:'Which transition best connects these two sentences: "The data was collected. ___ the results were inconclusive."',ctx:'',opts:['Furthermore,','However,','Therefore,','Similarly,'],correct:1,skill:'Writing',xp:15},
+    ],
+    SAT:[
+      {q:'If 3x + 7 = 22, what is the value of 6x − 4?',ctx:'Solve for x first, then substitute.',opts:['22','26','30','34'],correct:1,skill:'Algebra',xp:25},
+      {q:'A line passes through (2, 3) and (6, 11). What is its slope?',ctx:'',opts:['1','1.5','2','2.5'],correct:2,skill:'Algebra',xp:25},
+      {q:'A circle has equation x²+y²−6x+4y−12=0. What is its radius?',ctx:'Complete the square to find center and radius.',opts:['5','√21','√29','√17'],correct:0,skill:'Geometry',xp:30},
+      {q:'Which revision best improves clarity?',ctx:'Original: "The data, which was collected over a period of five years by researchers at the institute, suggests a correlation."',opts:['"The data collected over five years by institute researchers suggests a correlation."','"Researchers, who collected data for five years, they suggest a correlation."','"The five-year data collection, it suggests a correlation."','"Data suggests a correlation, having been collected over five years."'],correct:0,skill:'Writing',xp:20},
+    ],
+    ACT:[
+      {q:'What is the value of log₂(64)?',ctx:'',opts:['4','5','6','8'],correct:2,skill:'Math',xp:25},
+      {q:'Correct punctuation: "However __ the results were inconclusive."',ctx:'',opts:['However the results','However: the results','However, the results','However; the results'],correct:2,skill:'Grammar',xp:15},
+      {q:'If sin(θ) = 3/5 and θ is in the first quadrant, what is cos(θ)?',ctx:'',opts:['4/5','3/4','5/3','2/5'],correct:0,skill:'Math',xp:25},
+      {q:'Which word is used incorrectly? "The effect of the medicine effected a quick recovery."',ctx:'',opts:['"effect" (first use)','No errors','both "effect" and "effected"','"effected"'],correct:3,skill:'Grammar',xp:20},
+    ],
+    HSK:[
+      {q:'What is the correct Pinyin for 学校?',ctx:'This is a very common compound noun.',opts:['xuésheng','xuéxiào','xuéwèn','xuéqī'],correct:1,skill:'Pinyin',xp:20},
+      {q:'What does 我很高兴认识你 mean?',ctx:'Standard greeting phrase in Mandarin.',opts:['I am very busy today','Nice to meet you','I like studying Chinese','How are you?'],correct:1,skill:'Hanzi',xp:15},
+      {q:'Which correctly uses the 把 construction?',ctx:'The 把 structure emphasizes disposal of an object.',opts:['我把书读了','我读了书把','把我书读了','我读书把了'],correct:0,skill:'Grammar',xp:25},
+      {q:'Which is the correct measure word for 一__ 书?',ctx:'',opts:['个 (gè)','本 (běn)','张 (zhāng)','条 (tiáo)'],correct:1,skill:'Grammar',xp:20},
+    ],
+  },
+  universities:[
+    {id:'nus',flag:'🇸🇬',name:'National University of Singapore',country:'Singapore',cc:'SG',rank:8,majors:['Computer Science','Business','Engineering'],accept:'15%',sat:'1480+',ielts:'6.5+',toefl:'92+',hsk:null,tuition:'$15k/yr'},
+    {id:'mit',flag:'🇺🇸',name:'MIT',country:'United States',cc:'US',rank:1,majors:['Engineering','Physics','Computer Science'],accept:'4%',sat:'1560+',ielts:'7.0+',toefl:'100+',hsk:null,tuition:'$57k/yr'},
+    {id:'oxford',flag:'🇬🇧',name:'University of Oxford',country:'United Kingdom',cc:'UK',rank:3,majors:['Philosophy','Law','Medicine'],accept:'18%',sat:'N/A',ielts:'7.5+',toefl:'110+',hsk:null,tuition:'$35k/yr'},
+    {id:'melbourne',flag:'🇦🇺',name:'University of Melbourne',country:'Australia',cc:'AU',rank:33,majors:['Medicine','Architecture','Arts'],accept:'70%',sat:'N/A',ielts:'6.5+',toefl:'79+',hsk:null,tuition:'$30k/yr'},
+    {id:'delft',flag:'🇳🇱',name:'TU Delft',country:'Netherlands',cc:'NL',rank:47,majors:['Aerospace','Architecture','Engineering'],accept:'55%',sat:'N/A',ielts:'6.5+',toefl:'90+',hsk:null,tuition:'$18k/yr'},
+    {id:'pku',flag:'🇨🇳',name:'Peking University',country:'China',cc:'CN',rank:17,majors:['Medicine','Economics','Law'],accept:'12%',sat:'N/A',ielts:'6.0+',toefl:'85+',hsk:'HSK 6',tuition:'$5k/yr'},
+    {id:'stanford',flag:'🇺🇸',name:'Stanford University',country:'United States',cc:'US',rank:5,majors:['CS','Business','Humanities'],accept:'4%',sat:'1570+',ielts:'7.0+',toefl:'100+',hsk:null,tuition:'$56k/yr'},
+    {id:'cambridge',flag:'🇬🇧',name:'University of Cambridge',country:'United Kingdom',cc:'UK',rank:2,majors:['Mathematics','Natural Sciences','Engineering'],accept:'21%',sat:'N/A',ielts:'7.5+',toefl:'110+',hsk:null,tuition:'$34k/yr'},
+  ],
+  scholarships:[
+    {id:'chevening',name:'Chevening Scholarship',country:'UK',flag:'🇬🇧',provider:'UK Foreign Office',coverage:'Full',deadline:'Nov 5, 2025',req:['Bachelor\'s degree (min 2:1)','2 years work experience','Leadership potential'],docs:['Degree certificate','Employment records','3 reference letters','IELTS 6.5+'],apply:'Apply at chevening.org. Answer four essay questions about leadership and career goals.',premium:false},
+    {id:'pearson',name:'Lester B. Pearson Scholarship',country:'Canada',flag:'🇨🇦',provider:'University of Toronto',coverage:'Full',deadline:'Nov 15, 2025',req:['Academic excellence','Community leadership','School nomination'],docs:['Transcripts','Nomination letter','Personal statement','2 references'],apply:'School must nominate you first, then complete the UofT online application.',premium:false},
+    {id:'australia',name:'Australia Awards Scholarship',country:'Australia',flag:'🇦🇺',provider:'Australian Govt (DFAT)',coverage:'Full',deadline:'Apr 30, 2026',req:['Eligible developing country citizen','2+ years work experience'],docs:['Passport','Transcripts','Employment proof'],apply:'Apply through the Australia Awards portal. Indonesian applicants prioritized.',premium:false},
+    {id:'mext',name:'MEXT Japanese Gov. Scholarship',country:'Japan',flag:'🇯🇵',provider:'Ministry of Education',coverage:'Full',deadline:'May 20, 2026',req:['Age 17-34','Pass aptitude test','Medical exam'],docs:['Application form','Transcripts','Medical certificate'],apply:'Apply through the Japanese Embassy in your country.',premium:false},
+    {id:'nuffic',name:'Orange Knowledge Programme',country:'Netherlands',flag:'🇳🇱',provider:'Nuffic',coverage:'Partial',deadline:'Feb 1, 2026',req:['BSc degree','3 years experience','Employer nomination'],docs:['Employer letter','CV','Degree certificate'],apply:'Employer nominates you to Nuffic, then you complete the individual application.',premium:false},
+    {id:'gates',name:'Gates Cambridge Scholarship',country:'UK',flag:'🇬🇧',provider:'Gates Foundation / Cambridge',coverage:'Full',deadline:'Oct 12, 2025',req:['Exceptional academics','Leadership potential','Social commitment'],docs:['Cambridge application','Research proposal','Reference letters'],apply:'Apply through the Cambridge graduate application. Most competitive scholarship in the world.',premium:true},
+    {id:'daad',name:'DAAD Scholarship',country:'Germany',flag:'🇩🇪',provider:'Deutscher Akademischer Austauschdienst',coverage:'Full',deadline:'Oct 15, 2025',req:["Bachelor's degree","Min GPA 3.0","German or English skills"],docs:['CV','Motivation letter','Transcripts','Language certificate'],apply:'Apply through the DAAD portal at funding-guide.de.',premium:true},
+  ],
+  aptQs:[
+    {q:'When working on a group project, you prefer to...',opts:['Lead strategy and planning','Handle data analysis','Design the visuals','Write the content']},
+    {q:'Which type of problem excites you most?',opts:['Building something digital','Understanding human behavior','Solving equations','Crafting arguments']},
+    {q:'Your ideal work environment is...',opts:['Tech lab or startup','Research institute','Creative studio','International NGO']},
+    {q:'Which subject do you naturally excel at?',opts:['Math and logic','Social sciences','Arts and design','Biological sciences']},
+    {q:'In 10 years, you see yourself...',opts:['Running a tech company','Publishing research','Leading a creative agency','Healing communities']},
+    {q:'When facing a complex challenge, you...',opts:['Break it into logical steps','Consult people first','Visualize a creative solution','Research historical precedents']},
+    {q:'Your greatest strength is...',opts:['Analytical thinking','Empathy and communication','Creative vision','Scientific curiosity']},
+    {q:'Which tool do you enjoy most?',opts:['Code editor','Survey platform','Design software','Lab equipment']},
+    {q:'What motivates you most?',opts:['Building scalable systems','Helping people','Creating beautiful things','Discovering how the world works']},
+    {q:'Which academic field sounds most exciting?',opts:['Artificial Intelligence','Psychology / Sociology','Architecture / Design','Medicine / Biology']},
+  ],
+  lbUsers:[
+    {name:'Zara Ahmed',flag:'🇵🇰',xp:8420,wxp:640,lv:24,av:'Z',color:'#6C63FF'},
+    {name:'Wei Liang',flag:'🇨🇳',xp:7890,wxp:550,lv:22,av:'W',color:'#FF6B9D'},
+    {name:'Priya Sharma',flag:'🇮🇳',xp:7340,wxp:480,lv:21,av:'P',color:'#00E096'},
+    {name:'James Okafor',flag:'🇳🇬',xp:6780,wxp:390,lv:19,av:'J',color:'#FFB800'},
+    {name:'Hana Tanaka',flag:'🇯🇵',xp:5920,wxp:310,lv:17,av:'H',color:'#FF8C42'},
+  ],
+};
+
+const ST={
+  name:'',email:'',xp:0,level:1,streak:1,
+  selectedTests:[],placementResults:{},studyPlans:{},
+  savedUnis:[],tier:'free',achiev:[],
+  totalQ:0,totalC:0,
+};
+
+let ptCatIdx=0,ptQIdx=0,ptAnswers=[],ptTimer=0,ptInterval=null;
+let drillCat='IELTS',drillQIdx=0,drillAnswered=false,drillScore=0,drillTimer=0,drillInterval=null;
+let aptIdx=0,aptAnswers=[];
+let targetCatIdx=0,chosenTarget=null;
+let lbTab='global',uniFilter='all';
+
+function showObStep(n){
+  [0,1,2].forEach(i=>document.getElementById('ob-step'+i).style.display=i===n?'block':'none');
+  if(n===2) renderTestSel();
+}
+function renderTestSel(){
+  const el=document.getElementById('test-sel-list');
+  el.innerHTML=DATA.tests.map(t=>`
+    <div class="test-sel" id="tsel-${t.id}" onclick="toggleTest('${t.id}')">
+      <div style="display:flex;align-items:center;gap:12px">
+        <span style="font-size:26px">${t.emoji}</span>
+        <div><div style="font-size:15px;font-weight:700">${t.name}</div><div style="font-size:12px;color:var(--muted)">${t.sub}</div></div>
+        <div style="margin-left:auto;width:22px;height:22px;border-radius:11px;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:12px" id="tcheck-${t.id}"></div>
+      </div>
+    </div>`).join('')+'<div style="height:12px"></div>';
+}
+function toggleTest(id){
+  const idx=ST.selectedTests.indexOf(id);
+  if(idx>-1) ST.selectedTests.splice(idx,1);
+  else ST.selectedTests.push(id);
+  document.querySelectorAll('.test-sel').forEach(el=>{
+    const tid=el.id.replace('tsel-','');
+    const sel=ST.selectedTests.includes(tid);
+    el.classList.toggle('selected',sel);
+    document.getElementById('tcheck-'+tid).textContent=sel?'✓':'';
+    document.getElementById('tcheck-'+tid).style.borderColor=sel?'var(--purple)':'var(--border)';
+    document.getElementById('tcheck-'+tid).style.background=sel?'var(--purple)':'';
+    document.getElementById('tcheck-'+tid).style.color=sel?'#fff':'';
+  });
+}
+function submitProfile(){
+  const n=document.getElementById('inp-name').value.trim();
+  const e=document.getElementById('inp-email').value.trim();
+  if(!n||!e) return alert('Please fill in all fields');
+  ST.name=n; ST.email=e;
+  showObStep(2);
+}
+function startPlacement(){
+  if(!ST.selectedTests.length) return alert('Select at least one test!');
+  ptCatIdx=0; ptQIdx=0; ptAnswers=[]; ptTimer=0;
+  showScreen('s-placement');
+  renderPlacementQ();
+}
+
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  const isMain=id==='s-main';
+  document.getElementById('topbar').style.display=isMain?'flex':'none';
+  document.getElementById('bottom-nav').style.display=isMain?'flex':'none';
+}
+
+function renderPlacementQ(){
+  const cat=ST.selectedTests[ptCatIdx];
+  const qs=DATA.questions[cat];
+  if(ptQIdx>=qs.length){finishPlacementCat();return;}
+  clearInterval(ptInterval); ptTimer=0;
+  ptInterval=setInterval(()=>{ptTimer++;document.getElementById('pt-timer').textContent='⏱ '+ptTimer+'s';},1000);
+  const q=qs[ptQIdx];
+  const pct=Math.round((ptQIdx/qs.length)*100);
+  document.getElementById('pt-label').textContent=cat+' · Q'+(ptQIdx+1)+'/'+qs.length;
+  document.getElementById('pt-prog').style.width=pct+'%';
+  const body=document.getElementById('pt-body');
+  body.innerHTML=`
+    <div style="display:flex;gap:8px;margin-bottom:14px">
+      <span class="badge b-purple">${cat}</span>
+      <span class="badge b-blue">${q.skill}</span>
+    </div>
+    ${q.ctx?`<div style="background:rgba(255,255,255,.03);border-left:3px solid var(--purple);border-radius:4px;padding:12px;margin-bottom:14px;font-size:13px;color:var(--muted);line-height:1.6">${q.ctx}</div>`:''}
+    <div style="font-size:16px;font-weight:600;line-height:1.5;margin-bottom:18px">${q.q}</div>
+    <div id="pt-opts">
+      ${q.opts.map((o,i)=>`<div class="option" id="pt-opt-${i}" onclick="ptSelect(${i})"><div class="opt-lbl">${String.fromCharCode(65+i)}</div><span>${o}</span></div>`).join('')}
+    </div>
+    <div id="pt-feedback" style="display:none"></div>
+    <button class="btn btn-primary" id="pt-next" style="display:none;margin-top:12px" onclick="ptNext()">Next →</button>
+  `;
+}
+function ptSelect(idx){
+  const cat=ST.selectedTests[ptCatIdx];
+  const q=DATA.questions[cat][ptQIdx];
+  clearInterval(ptInterval);
+  document.querySelectorAll('[id^=pt-opt-]').forEach(el=>el.onclick=null);
+  document.getElementById('pt-opt-'+q.correct).classList.add('correct');
+  document.getElementById('pt-opt-'+q.correct).querySelector('.opt-lbl').textContent='✓';
+  if(idx!==q.correct){
+    document.getElementById('pt-opt-'+idx).classList.add('wrong');
+    document.getElementById('pt-opt-'+idx).querySelector('.opt-lbl').textContent='✗';
+  }
+  if(!ptAnswers[ptQIdx]) ptAnswers.push({chosen:idx,correct:q.correct,skill:q.skill});
+  const fb=document.getElementById('pt-feedback');
+  fb.style.display='block';
+  fb.innerHTML=`<div style="padding:12px;border-radius:10px;font-size:13px;background:rgba(108,99,255,.1);border:1px solid rgba(108,99,255,.2);color:#A89BFF;margin-top:8px">💡 ${idx===q.correct?'Correct! +'+q.xp+' XP':'Incorrect.'} — <em>${q.skill}</em></div>`;
+  document.getElementById('pt-next').style.display='flex';
+}
+function ptNext(){
+  ptQIdx++;
+  if(ptQIdx>=DATA.questions[ST.selectedTests[ptCatIdx]].length) finishPlacementCat();
+  else renderPlacementQ();
+}
+function finishPlacementCat(){
+  const cat=ST.selectedTests[ptCatIdx];
+  const qs=DATA.questions[cat];
+  const correct=ptAnswers.filter(a=>a.chosen===a.correct).length;
+  const acc=correct/qs.length;
+  const skillMap={};
+  ptAnswers.forEach(a=>{
+    if(!skillMap[a.skill]) skillMap[a.skill]={c:0,t:0};
+    skillMap[a.skill].t++;
+    if(a.chosen===a.correct) skillMap[a.skill].c++;
+  });
+  const weak=Object.entries(skillMap).filter(([,v])=>v.c/v.t<.5).map(([k])=>k);
+  const strong=Object.entries(skillMap).filter(([,v])=>v.c/v.t>=.75).map(([k])=>k);
+  function estScore(c,a){
+    if(c==='IELTS') return 'Band '+(a*4+5).toFixed(1);
+    if(c==='TOEFL') return Math.round(a*60+60)+'/120';
+    if(c==='SAT') return Math.round(a*800+800)+'/1600';
+    if(c==='ACT') return Math.round(a*24+12)+'/36';
+    if(c==='HSK') return 'Level '+Math.round(a*4+1);
+    return '';
+  }
+  ST.placementResults[cat]={correct,total:qs.length,acc,skillMap,weak,strong,score:estScore(cat,acc)};
+  showScreen('s-placement-result');
+  renderPlacementResult(cat);
+}
+function renderPlacementResult(cat){
+  const r=ST.placementResults[cat];
+  const pct=Math.round(r.acc*100);
+  const emoji=pct>=75?'🎉':pct>=50?'👍':'💪';
+  const catColors={IELTS:'#6C63FF',TOEFL:'#00E096',SAT:'#38BDF8',ACT:'#FF8C42',HSK:'#FF6B9D'};
+  const c=catColors[cat];
+  const next=ptCatIdx+1<ST.selectedTests.length?ST.selectedTests[ptCatIdx+1]:null;
+  document.getElementById('pr-body').innerHTML=`
+    <div style="padding:20px 0 0">
+      <div style="font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px">${cat} Placement Result</div>
+      <div style="font-size:52px;text-align:center;margin-bottom:10px">${emoji}</div>
+      <div style="font-size:32px;font-weight:800;color:${c};text-align:center">${r.score}</div>
+      <div style="font-size:14px;color:var(--muted);text-align:center;margin:4px 0 20px">${r.correct}/${r.total} correct · ${pct}% accuracy</div>
+      <div class="card">
+        <div class="sec-label">Skill Breakdown</div>
+        ${Object.entries(r.skillMap).map(([sk,v])=>{
+          const sp=Math.round(v.c/v.t*100);
+          const sc=sp>=75?'var(--green)':sp>=50?'var(--gold)':'var(--pink)';
+          return `<div style="margin-bottom:10px">
+            <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px"><span>${sk}</span><span style="color:${sc};font-weight:600">${sp}%</span></div>
+            <div class="pbar" style="height:5px"><div class="pfill" style="width:${sp}%;background:${sc}"></div></div>
+          </div>`;
+        }).join('')}
+      </div>
+      ${r.weak.length?`<div class="card" style="border-color:rgba(255,107,157,.2)"><div class="sec-label" style="color:var(--pink)">⚠ Needs Work</div><div style="display:flex;gap:8px;flex-wrap:wrap">${r.weak.map(a=>`<span class="badge b-pink">${a}</span>`).join('')}</div></div>`:''}
+      ${r.strong.length?`<div class="card" style="border-color:rgba(0,224,150,.2)"><div class="sec-label" style="color:var(--green)">✓ Strong Areas</div><div style="display:flex;gap:8px;flex-wrap:wrap">${r.strong.map(a=>`<span class="badge b-green">${a}</span>`).join('')}</div></div>`:''}
+      <button class="btn btn-primary" onclick="goToTarget()" style="margin-top:8px">${next?'Next: Set '+next+' Target →':'Set My Target Score →'}</button>
+    </div>
+  `;
+}
+function goToTarget(){
+  targetCatIdx=ptCatIdx;
+  chosenTarget=null;
+  showScreen('s-target');
+  renderTargetScreen();
+}
+const TARGET_LEVELS={
+  IELTS:[{v:5.5,l:'Band 5.5 (Basic)'},{v:6.0,l:'Band 6.0 (Competent)'},{v:6.5,l:'Band 6.5 (Good)'},{v:7.0,l:'Band 7.0 (Very Good)'},{v:7.5,l:'Band 7.5+'},{v:8.0,l:'Band 8.0 (Expert)'}],
+  TOEFL:[{v:79,l:'79 — Most universities'},{v:90,l:'90 — Strong'},{v:100,l:'100 — Top universities'},{v:110,l:'110 — Oxbridge level'}],
+  SAT:[{v:1200,l:'1200 — Solid'},{v:1350,l:'1350 — Competitive'},{v:1450,l:'1450 — Strong'},{v:1500,l:'1500 — Excellent'},{v:1550,l:'1550+ — Elite'}],
+  ACT:[{v:24,l:'24 — Average'},{v:27,l:'27 — Competitive'},{v:30,l:'30 — Strong'},{v:33,l:'33 — Excellent'},{v:36,l:'36 — Perfect'}],
+  HSK:[{v:3,l:'Level 3 — Intermediate'},{v:4,l:'Level 4 — Upper-Intermediate'},{v:5,l:'Level 5 — Advanced'},{v:6,l:'Level 6 — Mastery'}],
+};
+function renderTargetScreen(){
+  const cat=ST.selectedTests[targetCatIdx];
+  const r=ST.placementResults[cat];
+  const levels=TARGET_LEVELS[cat];
+  const catColors={IELTS:'#6C63FF',TOEFL:'#00E096',SAT:'#38BDF8',ACT:'#FF8C42',HSK:'#FF6B9D'};
+  const c=catColors[cat];
+  document.getElementById('target-body').innerHTML=`
+    <div style="padding:20px 0 0">
+      <div style="font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px">Set Your Goal (${targetCatIdx+1}/${ST.selectedTests.length})</div>
+      <div style="font-size:24px;font-weight:800;margin-bottom:6px">What's your ${cat} target?</div>
+      <div style="font-size:13px;color:var(--muted);margin-bottom:20px">We'll generate a personalized study plan based on your placement results</div>
+      <div class="card" style="border-color:${c}30;background:${c}10;margin-bottom:16px">
+        <div class="sec-label">📊 Your Placement Score</div>
+        <div style="font-size:28px;font-weight:800;color:${c}">${r.score}</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:2px">${r.correct}/${r.total} correct on placement test</div>
+        ${r.weak.length?`<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px">${r.weak.map(w=>`<span class="badge b-pink">⚠ ${w}</span>`).join('')}</div>`:''}
+      </div>
+      <div class="sec-label">Choose your target</div>
+      <div id="target-opts">
+        ${levels.map((lv,i)=>`
+          <div class="test-sel" id="tgt-${i}" onclick="selectTarget(${i},'${lv.l}',${lv.v},'${cat}')">
+            <div style="display:flex;align-items:center;justify-content:space-between">
+              <div>
+                <div style="font-size:15px;font-weight:700" id="tgtlbl-${i}">${lv.l}</div>
+              </div>
+              <div style="width:22px;height:22px;border-radius:11px;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:12px" id="tgtcheck-${i}"></div>
+            </div>
+          </div>`).join('')}
+      </div>
+      <div id="plan-preview" style="margin-top:12px"></div>
+      <button class="btn btn-primary" id="confirm-target-btn" style="margin-top:12px;display:none" onclick="confirmTarget()">Generate My Study Plan →</button>
+    </div>
+  `;
+}
+function selectTarget(i,label,val,cat){
+  chosenTarget={i,label,val,cat};
+  document.querySelectorAll('[id^=tgt-]').forEach(el=>el.classList.remove('selected'));
+  document.querySelectorAll('[id^=tgtcheck-]').forEach(el=>{el.textContent='';el.style.borderColor='var(--border)';el.style.background='';el.style.color='';});
+  document.getElementById('tgt-'+i).classList.add('selected');
+  const ch=document.getElementById('tgtcheck-'+i);
+  ch.textContent='✓';ch.style.borderColor='var(--purple)';ch.style.background='var(--purple)';ch.style.color='#fff';
+  const plan=genPlan(cat,val,label);
+  const catColors={IELTS:'#6C63FF',TOEFL:'#00E096',SAT:'#38BDF8',ACT:'#FF8C42',HSK:'#FF6B9D'};
+  const c=catColors[cat];
+  document.getElementById('plan-preview').innerHTML=`
+    <div class="card" style="border-color:${c}30">
+      <div class="sec-label" style="color:${c}">📋 Preview: Your Study Plan</div>
+      <div class="plan-stat-grid">
+        <div class="plan-stat" style="border-color:${c}30;background:${c}10"><div style="font-size:22px;font-weight:800;color:${c}">${plan.dailyMin}</div><div style="font-size:10px;color:var(--muted)">min/day</div></div>
+        <div class="plan-stat" style="border-color:${c}30;background:${c}10"><div style="font-size:22px;font-weight:800;color:${c}">${plan.questPerDay}</div><div style="font-size:10px;color:var(--muted)">questions/day</div></div>
+        <div class="plan-stat" style="border-color:${c}30;background:${c}10"><div style="font-size:22px;font-weight:800;color:${c}">${plan.weeks}</div><div style="font-size:10px;color:var(--muted)">est. weeks</div></div>
+      </div>
+      <div style="background:rgba(255,255,255,.03);border-radius:8px;padding:10px;font-size:12px;color:var(--muted);line-height:1.6">
+        🎯 Based on your score of <strong style="color:${c}">${ST.placementResults[cat].score}</strong>, practicing <strong style="color:${c}">${plan.dailyMin} minutes daily</strong> should get you to <strong style="color:${c}">${label}</strong> in approximately <strong style="color:${c}">${plan.weeks} weeks</strong>.
+      </div>
+    </div>
+  `;
+  document.getElementById('confirm-target-btn').style.display='flex';
+}
+function genPlan(cat,target,label){
+  const r=ST.placementResults[cat];
+  const gap=1-r.acc;
+  const weeks=Math.max(4,Math.round(gap*40));
+  const dailyMin=Math.min(60,Math.max(20,Math.round(gap*100)));
+  const questPerDay=Math.round(dailyMin/3);
+  const days=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  const focuses=r.weak.length?r.weak:Object.keys(r.skillMap);
+  const schedule=days.map((d,i)=>({day:d,focus:focuses[i%focuses.length]||'Reading',minutes:i>=5?Math.round(dailyMin*1.5):dailyMin}));
+  const milestones=[
+    {week:Math.round(weeks*.25),goal:'Complete weak area basics',xp:200},
+    {week:Math.round(weeks*.5),goal:'Reach 70% accuracy on practice sets',xp:400},
+    {week:Math.round(weeks*.75),goal:'Full mock test simulation',xp:600},
+    {week:weeks,goal:'Achieve target: '+label,xp:1000},
+  ];
+  return {weeks,dailyMin,questPerDay,schedule,milestones,label,target,cat,currentScore:r.score,weak:r.weak,strong:r.strong};
+}
+function confirmTarget(){
+  if(!chosenTarget) return;
+  const plan=genPlan(chosenTarget.cat,chosenTarget.val,chosenTarget.label);
+  ST.studyPlans[chosenTarget.cat]=plan;
+  const nextCat=targetCatIdx+1<ST.selectedTests.length?ST.selectedTests[targetCatIdx+1]:null;
+  if(nextCat){
+    ptCatIdx++;targetCatIdx++;
+    ptQIdx=0;ptAnswers=[];ptTimer=0;chosenTarget=null;
+    showScreen('s-placement');
+    renderPlacementQ();
+  } else {
+    showScreen('s-plan');
+    renderPlan();
+  }
+}
+function renderPlan(){
+  const cats=Object.keys(ST.studyPlans);
+  const plan=ST.studyPlans[cats[0]];
+  const catColors={IELTS:'#6C63FF',TOEFL:'#00E096',SAT:'#38BDF8',ACT:'#FF8C42',HSK:'#FF6B9D'};
+  const c=catColors[plan.cat];
+  const catTabs=cats.map(ct=>`<button onclick="switchPlanCat('${ct}')" style="padding:7px 14px;border-radius:20px;border:1px solid ${ST.studyPlans[ct]===plan?c:'var(--border)'};background:${ST.studyPlans[ct]===plan?c+'20':'none'};color:${ST.studyPlans[ct]===plan?c:'var(--muted)'};font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;cursor:pointer">${ct}</button>`).join('');
+  const days=['M','T','W','T','F','S','S'];
+  document.getElementById('plan-body').innerHTML=`
+    <div style="padding:20px 0 0">
+      <div style="font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px">Your Personalized Study Plan</div>
+      <div style="font-size:22px;font-weight:800;margin-bottom:16px">Ready to achieve ${plan.label}? 🚀</div>
+      ${cats.length>1?`<div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">${catTabs}</div>`:''}
+      <div style="background:${c}18;border:1px solid ${c}30;border-radius:var(--r);padding:14px;margin-bottom:14px">
+        <div style="display:flex;align-items:center;margin-bottom:12px">
+          <div style="flex:1;text-align:center"><div style="font-size:11px;color:var(--muted);text-transform:uppercase">Current</div><div style="font-size:22px;font-weight:800;color:var(--muted)">${plan.currentScore}</div></div>
+          <div style="color:${c};font-size:22px;padding:0 10px">→</div>
+          <div style="flex:1;text-align:center"><div style="font-size:11px;color:var(--muted);text-transform:uppercase">Target</div><div style="font-size:18px;font-weight:800;color:${c}">${plan.label}</div></div>
+        </div>
+        <div class="pbar" style="height:6px"><div class="pfill" style="width:3%;background:${c}"></div></div>
+        <div style="font-size:11px;color:var(--muted);margin-top:4px">Day 0 of ${plan.weeks*7} · Just starting</div>
+      </div>
+      <div class="plan-stat-grid" style="margin-bottom:16px">
+        <div class="plan-stat" style="border-color:${c}30;background:${c}10"><span style="font-size:18px">⏱</span><div style="font-size:20px;font-weight:800;color:${c}">${plan.dailyMin}</div><div style="font-size:10px;color:var(--muted)">min/day</div></div>
+        <div class="plan-stat" style="border-color:${c}30;background:${c}10"><span style="font-size:18px">❓</span><div style="font-size:20px;font-weight:800;color:${c}">${plan.questPerDay}</div><div style="font-size:10px;color:var(--muted)">q's/day</div></div>
+        <div class="plan-stat" style="border-color:${c}30;background:${c}10"><span style="font-size:18px">📅</span><div style="font-size:20px;font-weight:800;color:${c}">${plan.weeks}</div><div style="font-size:10px;color:var(--muted)">est. weeks</div></div>
+      </div>
+      <div class="sec-label">Weekly Schedule</div>
+      <div class="card">
+        <div class="week-grid">
+          ${plan.schedule.map((d,i)=>`
+            <div class="day-col">
+              <div style="font-size:10px;color:var(--muted);font-weight:600">${days[i]}</div>
+              <div class="day-circle" style="background:${c}18;border-color:${c}40">
+                <div style="font-size:10px;font-weight:700;color:${c}">${d.minutes}</div>
+                <div style="font-size:8px;color:var(--muted)">min</div>
+              </div>
+              <div style="font-size:8px;color:var(--muted);text-align:center;line-height:1.2">${(d.focus||'').split(' ')[0]}</div>
+            </div>`).join('')}
+        </div>
+      </div>
+      ${plan.weak.length?`<div class="sec-label">⚠ Priority Areas</div><div class="card" style="border-color:rgba(255,107,157,.2)">${plan.weak.map(a=>`<div style="background:rgba(255,107,157,.1);border-radius:8px;padding:10px;margin-bottom:8px"><div style="font-size:13px;font-weight:700;color:var(--pink)">⚠ ${a}</div><div style="font-size:11px;color:var(--muted)">High priority — focus here first</div></div>`).join('')}</div>`:''}
+      <div class="sec-label">Milestones</div>
+      ${plan.milestones.map((m,i)=>`
+        <div class="milestone-row">
+          <div class="ms-dot" style="background:${i<2?'var(--border)':c}"></div>
+          <div style="flex:1"><div style="font-size:11px;color:var(--muted);text-transform:uppercase">Week ${m.week}</div><div style="font-size:13px;font-weight:600">${m.goal}</div></div>
+          <div style="background:rgba(108,99,255,.12);border-radius:8px;padding:4px 8px;font-size:12px;font-weight:700;color:${c}">+${m.xp} XP</div>
+        </div>`).join('')}
+      <div style="margin-top:20px;background:linear-gradient(135deg,rgba(255,184,0,.12),rgba(108,99,255,.12));border:1px solid rgba(255,184,0,.2);border-radius:var(--r);padding:18px;text-align:center">
+        <div style="font-size:28px;margin-bottom:8px">⭐</div>
+        <div style="font-size:18px;font-weight:800;margin-bottom:6px">Unlock Full Plan</div>
+        <div style="font-size:13px;color:var(--muted);margin-bottom:16px">Get detailed analytics, question explanations & daily coaching</div>
+        <button class="btn btn-primary" onclick="showPaywall()" style="margin-bottom:8px">View Premium Plans →</button>
+        <button class="btn btn-outline" onclick="enterApp()" style="margin-top:0;font-size:13px;padding:10px">Continue Free →</button>
+      </div>
+      <div style="height:24px"></div>
+    </div>
+  `;
+}
+function switchPlanCat(cat){
+  const cats=Object.keys(ST.studyPlans);
+  const plan=ST.studyPlans[cat];
+  renderPlan();
+}
+function showPaywall(){
+  showScreen('s-paywall');
+  document.getElementById('paywall-body').innerHTML=`
+    <div style="padding:20px 0 0">
+      <div style="text-align:center;background:linear-gradient(135deg,rgba(108,99,255,.2),rgba(255,107,157,.1));border:1px solid rgba(108,99,255,.2);border-radius:var(--r);padding:22px;margin-bottom:20px">
+        <div style="font-size:36px;margin-bottom:8px">⭐</div>
+        <div style="font-size:22px;font-weight:800;margin-bottom:6px">High Achievers Premium</div>
+        <div style="font-size:13px;color:var(--muted);line-height:1.6">Unlock your full personalized study experience and maximize your chances of reaching your dream score</div>
+      </div>
+      <div style="display:flex;gap:10px;margin-bottom:20px">
+        <div class="paywall-plan" onclick="selectPlan(this,'monthly')">
+          <div style="font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;margin-bottom:6px">Monthly</div>
+          <div style="font-size:26px;font-weight:800">$9.99</div>
+          <div style="font-size:12px;color:var(--muted)">/month</div>
+        </div>
+        <div class="paywall-plan active" onclick="selectPlan(this,'yearly')">
+          <div style="font-size:9px;font-weight:700;background:var(--gold);color:#000;border-radius:20px;padding:3px 8px;margin-bottom:6px;display:inline-block">BEST VALUE — SAVE 50%</div>
+          <div style="font-size:26px;font-weight:800;color:var(--gold)">$59.99</div>
+          <div style="font-size:12px;color:var(--muted)">/year · Only $5/mo</div>
+        </div>
+      </div>
+      <div class="card" style="margin-bottom:16px">
+        <div class="sec-label">What you get with Premium</div>
+        ${['Unlimited practice questions','Full question explanations & tips','Personalized daily study schedule','Weakness & strength analytics','Mock exam simulations','Exclusive premium scholarships','Priority leaderboard badge','Offline mode (cached questions)','Progress reports & insights'].map(f=>`<div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px"><span style="color:var(--green);font-size:14px">✓</span>${f}</div>`).join('')}
+      </div>
+      <button class="btn btn-primary" onclick="upgradePremium()">Subscribe to Premium →</button>
+      <button class="btn btn-outline" onclick="enterApp()" style="margin-top:8px;font-size:13px;padding:10px">Continue with Free Plan</button>
+      <div style="font-size:11px;color:var(--muted);text-align:center;margin-top:10px">Cancel anytime. No hidden fees.</div>
+      <div style="height:24px"></div>
+    </div>
+  `;
+}
+function selectPlan(el,plan){
+  document.querySelectorAll('.paywall-plan').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active');
+}
+function upgradePremium(){
+  ST.tier='premium';
+  enterApp();
+}
+function enterApp(){
+  showScreen('s-main');
+  document.getElementById('topbar').style.display='flex';
+  document.getElementById('bottom-nav').style.display='flex';
+  ST.streak=7;
+  goTab('home');
+}
+function updateTopBar(){
+  document.getElementById('xp-disp').textContent=ST.xp.toLocaleString();
+  document.getElementById('streak-disp').textContent=ST.streak;
+}
+function goTab(tab){
+  ['home','leaderboard','university','scholarships','profile'].forEach(t=>{
+    const el=document.getElementById('tab-'+t);
+    if(el){el.style.display=t===tab?'block':'none';}
+    const nb=document.getElementById('nb-'+t);
+    if(nb) nb.classList.toggle('active',t===tab);
+  });
+  ['drill','aptitude'].forEach(t=>{
+    const el=document.getElementById('tab-'+t);
+    if(el) el.style.display='none';
+  });
+  updateTopBar();
+  if(tab==='home') renderHome();
+  else if(tab==='leaderboard') renderLeaderboard();
+  else if(tab==='university') renderUniversity();
+  else if(tab==='scholarships') renderScholarships();
+  else if(tab==='profile') renderProfile();
+}
+function closeTab(id){
+  document.getElementById(id).style.display='none';
+  clearInterval(drillInterval);
+  goTab('home');
+}
+function openTab(id){
+  ['home','leaderboard','university','scholarships','profile','drill','aptitude'].forEach(t=>{
+    const el=document.getElementById('tab-'+t);
+    if(el) el.style.display='none';
+  });
+  const el=document.getElementById(id);
+  if(el) el.style.display=id==='drill'||id==='aptitude'?'flex':'block';
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+}
+
+function renderHome(){
+  const plan=ST.studyPlans[ST.selectedTests[0]]||null;
+  const catColors={IELTS:'#6C63FF',TOEFL:'#00E096',SAT:'#38BDF8',ACT:'#FF8C42',HSK:'#FF6B9D'};
+  const catEmoji={IELTS:'🇬🇧',TOEFL:'🌐',SAT:'📐',ACT:'🧮',HSK:'🇨🇳'};
+  const xpInLevel=ST.xp%500;
+  document.getElementById('tab-home').innerHTML=`
+    <div class="hero-grad">
+      <div style="display:flex;justify-content:space-between;align-items:start">
+        <div>
+          <div style="font-size:18px;font-weight:800">Good morning, ${ST.name||'Scholar'}! 👋</div>
+          <div style="font-size:13px;color:var(--muted);margin-top:2px">Level ${ST.level} Scholar${ST.tier==='premium'?' · ⭐ Premium':''}</div>
+        </div>
+      </div>
+      <div style="margin-top:12px">
+        <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:5px"><span>${xpInLevel}/500 XP</span><span>Level ${ST.level+1} →</span></div>
+        <div class="pbar" style="height:8px"><div class="pfill p-purple" style="width:${Math.round(xpInLevel/5)}%"></div></div>
+      </div>
+    </div>
+    <div class="stat-row">
+      <div class="stat-box"><div class="stat-val" style="color:var(--gold)">🔥 ${ST.streak}</div><div class="stat-lbl">Streak</div></div>
+      <div class="stat-box"><div class="stat-val" style="color:var(--green)">${ST.totalQ>0?Math.round(ST.totalC/ST.totalQ*100):94}%</div><div class="stat-lbl">Accuracy</div></div>
+      <div class="stat-box"><div class="stat-val" style="color:var(--blue)">${ST.xp.toLocaleString()}</div><div class="stat-lbl">Total XP</div></div>
+    </div>
+    ${plan?`
+      <div class="sec-label">Today's Study Plan</div>
+      <div style="background:linear-gradient(135deg,rgba(108,99,255,.15),rgba(56,189,248,.08));border:1px solid rgba(108,99,255,.2);border-radius:var(--r);padding:16px;margin-bottom:16px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+          <div><div style="font-size:14px;font-weight:700">${plan.cat} — Day 1 of ${plan.weeks*7}</div><div style="font-size:11px;color:var(--muted)">Focus: ${plan.schedule[new Date().getDay()]?.focus||plan.schedule[0].focus}</div></div>
+          <span class="badge b-purple">${plan.dailyMin} min</span>
+        </div>
+        <div style="display:flex;gap:16px;margin-bottom:12px">
+          <div style="text-align:center"><div style="font-size:18px;font-weight:800">${plan.questPerDay}</div><div style="font-size:10px;color:var(--muted)">questions</div></div>
+          <div style="text-align:center"><div style="font-size:14px;font-weight:800">${plan.label.split(' ')[0]}</div><div style="font-size:10px;color:var(--muted)">target</div></div>
+          <div style="text-align:center"><div style="font-size:18px;font-weight:800">${plan.weeks}w</div><div style="font-size:10px;color:var(--muted)">est.</div></div>
+        </div>
+        <button class="btn btn-primary" style="font-size:13px;padding:11px" onclick="startDrill('${plan.cat}')">Start Today's Practice →</button>
+      </div>`:''}
+    <div class="sec-label">Practice Categories</div>
+    <div class="cat-grid">
+      ${ST.selectedTests.map(cat=>{
+        const r=ST.placementResults[cat];
+        const pct=r?Math.round(r.acc*100):0;
+        const catClass={IELTS:'',TOEFL:'toefl',SAT:'sat',ACT:'act',HSK:'hsk'}[cat];
+        return `<div class="cat-card ${catClass}" onclick="startDrill('${cat}')">
+          <div style="font-size:24px;margin-bottom:5px">${catEmoji[cat]}</div>
+          <div style="font-size:14px;font-weight:700;color:${catColors[cat]}">${cat}</div>
+          ${r?`<div style="font-size:11px;color:var(--muted);margin-top:2px">${r.score}</div>`:''}
+          <div style="margin-top:8px"><div style="font-size:10px;color:var(--muted);margin-bottom:3px">${pct}%</div><div class="pbar" style="height:4px"><div class="pfill p-purple" style="width:${pct}%"></div></div></div>
+        </div>`;
+      }).join('')}
+    </div>
+    <div class="sec-label">Daily Mission</div>
+    <div style="background:linear-gradient(135deg,rgba(0,224,150,.12),rgba(56,189,248,.06));border:1px solid rgba(0,224,150,.2);border-radius:var(--r);padding:14px;margin-bottom:14px">
+      <div style="display:flex;align-items:center;gap:12px">
+        <span style="font-size:30px">🎯</span>
+        <div style="flex:1">
+          <div style="font-size:14px;font-weight:700">Complete ${plan?plan.questPerDay:10} Questions</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:2px">Reward: 200 XP + Streak Bonus</div>
+          <div style="margin-top:8px"><div class="pbar" style="height:5px"><div class="pfill p-green" style="width:60%"></div></div><div style="font-size:10px;color:var(--muted);margin-top:3px">6/${plan?plan.questPerDay:10} completed</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="sec-label">Discover Your Path</div>
+    <div class="card" style="cursor:pointer;display:flex;align-items:center;gap:12px" onclick="openAptitude()">
+      <span style="font-size:28px">🧭</span>
+      <div style="flex:1"><div style="font-size:14px;font-weight:700">Major Aptitude Test</div><div style="font-size:12px;color:var(--muted);margin-top:2px">10-question quiz to find your ideal major</div></div>
+      <span style="color:var(--muted);font-size:18px">›</span>
+    </div>
+    <div style="height:16px"></div>
+  `;
+}
+function startDrill(cat){
+  drillCat=cat;drillQIdx=0;drillAnswered=false;drillScore=0;drillTimer=0;
+  clearInterval(drillInterval);
+  openTab('tab-drill');
+  document.getElementById('drill-label').textContent=cat+' Practice';
+  drillInterval=setInterval(()=>{drillTimer++;document.getElementById('drill-timer').textContent='⏱ '+drillTimer+'s';},1000);
+  renderDrillQ();
+}
+function renderDrillQ(){
+  const qs=DATA.questions[drillCat];
+  if(drillQIdx>=qs.length){showDrillResult();return;}
+  const q=qs[drillQIdx];
+  drillAnswered=false;
+  const pct=Math.round((drillQIdx/qs.length)*100);
+  document.getElementById('drill-prog').style.width=pct+'%';
+  document.getElementById('drill-body').innerHTML=`
+    <div style="display:flex;gap:8px;margin-bottom:12px"><span class="badge b-purple">Q${drillQIdx+1}/${qs.length}</span><span class="badge b-blue">${q.skill}</span></div>
+    ${q.ctx?`<div style="background:rgba(255,255,255,.03);border-left:3px solid var(--purple);border-radius:4px;padding:12px;margin-bottom:14px;font-size:13px;color:var(--muted);line-height:1.6">${q.ctx}</div>`:''}
+    <div style="font-size:16px;font-weight:600;line-height:1.5;margin-bottom:18px">${q.q}</div>
+    ${q.opts.map((o,i)=>`<div class="option" id="do-${i}" onclick="drillSelect(${i})"><div class="opt-lbl">${String.fromCharCode(65+i)}</div><span>${o}</span></div>`).join('')}
+    <div id="drill-fb" style="display:none"></div>
+    <button class="btn btn-primary" id="drill-next-btn" style="display:none;margin-top:12px" onclick="drillNext()">${drillQIdx+1<qs.length?'Next Question →':'See Results →'}</button>
+  `;
+}
+function drillSelect(idx){
+  if(drillAnswered) return;
+  drillAnswered=true;
+  const q=DATA.questions[drillCat][drillQIdx];
+  document.querySelectorAll('[id^=do-]').forEach(el=>el.onclick=null);
+  document.getElementById('do-'+q.correct).classList.add('correct');
+  document.getElementById('do-'+q.correct).querySelector('.opt-lbl').textContent='✓';
+  const correct=idx===q.correct;
+  if(!correct){document.getElementById('do-'+idx).classList.add('wrong');document.getElementById('do-'+idx).querySelector('.opt-lbl').textContent='✗';}
+  else{drillScore++;ST.xp+=q.xp;ST.totalC++;showXpToast('+'+q.xp+' XP ⚡');}
+  ST.totalQ++;updateTopBar();
+  const fb=document.getElementById('drill-fb');
+  fb.style.display='block';
+  if(ST.tier==='premium'){
+    fb.innerHTML=`<div class="card" style="border-color:rgba(108,99,255,.2);margin-top:10px"><div class="sec-label" style="color:var(--purple)">💡 Explanation</div><div style="font-size:13px;color:var(--muted);line-height:1.6">Correct answer: <strong style="color:${correct?'var(--green)':'var(--pink)'}">${q.opts[q.correct]}</strong>. This tests your ${q.skill} skills — review this concept in your study plan.</div></div>`;
+  } else {
+    fb.innerHTML=`<div style="display:flex;align-items:center;gap:8px;background:rgba(255,184,0,.1);border:1px solid rgba(255,184,0,.25);border-radius:10px;padding:12px;margin-top:10px;cursor:pointer" onclick="showPaywall()"><span style="font-size:18px">🔒</span><div><div style="font-size:13px;font-weight:700;color:var(--gold)">Premium: Full Explanation</div><div style="font-size:11px;color:var(--muted)">Upgrade to unlock explanations for every question</div></div></div>`;
+  }
+  document.getElementById('drill-next-btn').style.display='flex';
+}
+function showXpToast(msg){
+  const t=document.getElementById('xp-toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),1500);
+}
+function drillNext(){
+  drillQIdx++;
+  if(drillQIdx>=DATA.questions[drillCat].length) showDrillResult();
+  else renderDrillQ();
+}
+function showDrillResult(){
+  clearInterval(drillInterval);
+  const total=DATA.questions[drillCat].length;
+  const pct=Math.round(drillScore/total*100);
+  const emoji=pct>=80?'🎉':pct>=60?'👍':'💪';
+  document.getElementById('drill-prog').style.width='100%';
+  document.getElementById('drill-body').innerHTML=`
+    <div style="text-align:center;padding:24px 0">
+      <div style="font-size:52px;margin-bottom:10px">${emoji}</div>
+      <div style="font-size:24px;font-weight:800;margin-bottom:4px">${pct>=80?'Excellent!':pct>=60?'Good Job!':'Keep Going!'}</div>
+      <div style="font-size:14px;color:var(--muted);margin-bottom:24px">${drillScore}/${total} correct · ${pct}% accuracy</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:24px">
+        <div class="stat-box"><div class="stat-val" style="color:var(--purple)">+${drillScore*20}</div><div class="stat-lbl">XP Earned</div></div>
+        <div class="stat-box"><div class="stat-val" style="color:var(--green)">${pct}%</div><div class="stat-lbl">Accuracy</div></div>
+        <div class="stat-box"><div class="stat-val" style="color:var(--gold)">${drillTimer}s</div><div class="stat-lbl">Time</div></div>
+      </div>
+      <button class="btn btn-primary" onclick="startDrill('${drillCat}')">Practice Again</button>
+      <button class="btn btn-outline" onclick="closeTab('tab-drill')">Back to Home</button>
+    </div>
+  `;
+}
+function renderLeaderboard(){
+  const globalData=[...DATA.lbUsers,{name:ST.name||'You',flag:'🇮🇩',xp:ST.xp||2450,wxp:580,lv:ST.level,av:(ST.name||'A')[0],color:'#38BDF8',isMe:true}].sort((a,b)=>b.xp-a.xp);
+  const weeklyData=[...DATA.lbUsers,{name:ST.name||'You',flag:'🇮🇩',xp:ST.xp,wxp:580,lv:ST.level,av:(ST.name||'A')[0],color:'#38BDF8',isMe:true}].sort((a,b)=>b.wxp-a.wxp);
+  window._lbGlobal=globalData;window._lbWeekly=weeklyData;
+  renderLbTab('global');
+}
+function renderLbTab(tab){
+  lbTab=tab;
+  const data=tab==='weekly'?window._lbWeekly:window._lbGlobal;
+  const xpKey=tab==='weekly'?'wxp':'xp';
+  const top3=data.slice(0,3),rest=data.slice(3);
+  const medals=['🥇','🥈','🥉'];
+  const heights=[70,54,44],sizes=[52,44,40];
+  const podOrder=[1,0,2];
+  document.getElementById('tab-leaderboard').innerHTML=`
+    <div style="font-size:22px;font-weight:800;margin-bottom:14px">Leaderboard 🏆</div>
+    <div style="display:flex;gap:8px;margin-bottom:20px">
+      ${['global','weekly'].map(t=>`<button onclick="renderLbTab('${t}')" style="flex:1;padding:8px;border-radius:8px;border:1.5px solid ${lbTab===t?'var(--purple)':'var(--border)'};background:${lbTab===t?'rgba(108,99,255,.12)':'none'};color:${lbTab===t?'var(--purple)':'var(--muted)'};font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;cursor:pointer">${t.charAt(0).toUpperCase()+t.slice(1)}</button>`).join('')}
+    </div>
+    <div class="lb-podium">
+      ${podOrder.map(i=>{
+        if(!top3[i]) return '<div style="flex:1"></div>';
+        const u=top3[i];
+        const pos=i+1;
+        const h=heights[i],sz=sizes[i];
+        const podColors=['var(--gold)','#C0C0C0','#CD7F32'];
+        return `<div class="podium-spot" style="justify-content:flex-end">
+          <div style="width:${sz}px;height:${sz}px;border-radius:${sz/2}px;background:${u.color}22;border:2px solid ${podColors[i]};display:flex;align-items:center;justify-content:center;font-size:${sz*.35}px;font-weight:700;color:${u.color};margin-bottom:4px">${u.av}</div>
+          <div style="font-size:11px;font-weight:700;margin-bottom:2px">${u.name.split(' ')[0]}</div>
+          <div style="font-size:10px;color:var(--muted);margin-bottom:4px">${u[xpKey].toLocaleString()}</div>
+          <div class="podium-base" style="height:${h}px;background:${podColors[i]}18;border:1px solid ${podColors[i]}40;width:100%">${medals[i]}</div>
+        </div>`;
+      }).join('')}
+    </div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--r);overflow:hidden">
+      ${rest.map((u,i)=>`
+        <div class="lb-row ${u.isMe?'lb-me':''}">
+          <div style="width:24px;font-size:14px;font-weight:700;color:var(--muted);text-align:center">${i+4}</div>
+          <div style="width:36px;height:36px;border-radius:18px;background:${u.color}22;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:${u.color}">${u.av}</div>
+          <div style="flex:1"><div style="font-size:14px;font-weight:600">${u.name}${u.isMe?' <span style="font-size:10px;color:var(--purple)">(you)</span>':''}</div><div style="font-size:11px;color:var(--muted)">${u.flag} Lv.${u.lv}</div></div>
+          <div style="font-size:13px;font-weight:700;color:${u.color}">${u[xpKey].toLocaleString()} XP</div>
+        </div>`).join('')}
+    </div>
+    <div style="height:16px"></div>
+  `;
+}
+function renderUniversity(){
+  window._uniFilter=window._uniFilter||'all';
+  window._uniSearch=window._uniSearch||'';
+  const filters=[{l:'All',c:'all'},{l:'🇺🇸 USA',c:'US'},{l:'🇬🇧 UK',c:'UK'},{l:'🇦🇺 AU',c:'AU'},{l:'🇸🇬 SG',c:'SG'},{l:'🇳🇱 NL',c:'NL'},{l:'🇨🇳 CN',c:'CN'}];
+  const list=DATA.universities.filter(u=>(window._uniFilter==='all'||u.cc===window._uniFilter)&&(!window._uniSearch||u.name.toLowerCase().includes(window._uniSearch.toLowerCase()))).sort((a,b)=>a.rank-b.rank);
+  document.getElementById('tab-university').innerHTML=`
+    <div style="font-size:22px;font-weight:800;margin-bottom:14px">University Explorer 🎓</div>
+    <div style="display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--border);border-radius:var(--rs);padding:10px 14px;margin-bottom:12px">
+      <span style="font-size:14px">🔍</span>
+      <input type="text" placeholder="Search universities..." style="background:none;border:none;outline:none;color:var(--text);font-family:'Outfit',sans-serif;font-size:14px;flex:1;margin:0;padding:0" value="${window._uniSearch||''}" oninput="window._uniSearch=this.value;renderUniversity()">
+    </div>
+    <div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin-bottom:14px">
+      ${filters.map(f=>`<button onclick="window._uniFilter='${f.c}';renderUniversity()" style="white-space:nowrap;padding:6px 12px;border-radius:20px;border:1px solid ${window._uniFilter===f.c?'var(--purple)':'var(--border)'};background:${window._uniFilter===f.c?'rgba(108,99,255,.12)':'none'};color:${window._uniFilter===f.c?'var(--purple)':'var(--muted)'};font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;cursor:pointer">${f.l}</button>`).join('')}
+    </div>
+    ${list.map(u=>`
+      <div class="card" style="cursor:pointer;margin-bottom:10px" onclick="openUni('${u.id}')">
+        <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:10px">
+          <span style="font-size:28px">${u.flag}</span>
+          <div style="flex:1"><div style="font-size:14px;font-weight:700">${u.name}</div><div style="font-size:12px;color:var(--muted)">${u.country}</div></div>
+          <div style="text-align:right"><div style="font-size:20px;font-weight:800;color:var(--gold)">#${u.rank}</div><div style="font-size:9px;color:var(--muted)">QS Rank</div></div>
+        </div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">
+          ${u.sat!=='N/A'?`<span class="badge b-purple">SAT ${u.sat}</span>`:''}
+          <span class="badge b-blue">IELTS ${u.ielts}</span>
+          <span class="badge b-green">TOEFL ${u.toefl}</span>
+          ${u.hsk?`<span class="badge b-pink">${u.hsk}</span>`:''}
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div style="font-size:12px;color:var(--muted)">📚 ${u.majors.slice(0,3).join(' · ')}</div>
+          <button onclick="event.stopPropagation();toggleSaveUni('${u.id}')" style="background:none;border:none;cursor:pointer;font-size:16px">${ST.savedUnis.includes(u.id)?'❤️':'🤍'}</button>
+        </div>
+      </div>`).join('')}
+    <div style="height:16px"></div>
+  `;
+}
+function openUni(id){
+  const u=DATA.universities.find(x=>x.id===id);
+  if(!u) return;
+  const m=document.getElementById('modal-uni');
+  document.getElementById('modal-uni-body').innerHTML=`
+    <div class="modal-handle"></div>
+    <div style="display:flex;justify-content:space-between;margin-bottom:14px"><button onclick="closeModal('modal-uni')" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:20px">✕</button><button onclick="toggleSaveUni('${u.id}')" style="background:none;border:none;cursor:pointer;font-size:20px">${ST.savedUnis.includes(u.id)?'❤️':'🤍'}</button></div>
+    <div style="font-size:48px;margin-bottom:10px">${u.flag}</div>
+    <div style="font-size:20px;font-weight:800;margin-bottom:4px">${u.name}</div>
+    <div style="font-size:13px;color:var(--muted);margin-bottom:16px">${u.country}</div>
+    <div style="display:flex;gap:8px;margin-bottom:16px">
+      <div class="stat-box" style="flex:1"><div class="stat-val" style="color:var(--gold)">#${u.rank}</div><div class="stat-lbl">QS Rank</div></div>
+      <div class="stat-box" style="flex:1"><div class="stat-val" style="color:var(--purple)">${u.accept}</div><div class="stat-lbl">Accept Rate</div></div>
+      <div class="stat-box" style="flex:1"><div class="stat-val" style="color:var(--green);font-size:14px">${u.tuition}</div><div class="stat-lbl">Tuition</div></div>
+    </div>
+    <div class="sec-label">Required Scores</div>
+    <div class="card">
+      ${[['SAT',u.sat],['IELTS',u.ielts],['TOEFL',u.toefl],...(u.hsk?[['HSK',u.hsk]]:[])].map(([l,v])=>`<div style="display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--border);font-size:13px"><span style="color:var(--muted)">${l}</span><span style="font-weight:700">${v}</span></div>`).join('')}
+    </div>
+    <div class="sec-label">Top Majors</div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px">${u.majors.map(m=>`<span class="badge b-purple">${m}</span>`).join('')}</div>
+    <button class="btn btn-primary" onclick="toggleSaveUni('${u.id}');closeModal('modal-uni')">Save University ♡</button>
+  `;
+  m.classList.add('open');
+}
+function toggleSaveUni(id){
+  const idx=ST.savedUnis.indexOf(id);
+  if(idx>-1) ST.savedUnis.splice(idx,1);
+  else ST.savedUnis.push(id);
+}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+function renderScholarships(){
+  const visible=DATA.scholarships.filter(s=>!s.premium||ST.tier==='premium');
+  const locked=DATA.scholarships.filter(s=>s.premium&&ST.tier!=='premium');
+  document.getElementById('tab-scholarships').innerHTML=`
+    <div style="font-size:22px;font-weight:800;margin-bottom:4px">Scholarship Hub 💰</div>
+    <div style="font-size:13px;color:var(--muted);margin-bottom:16px">Find funding for your study abroad journey</div>
+    ${visible.map(s=>`
+      <div class="card" style="margin-bottom:10px">
+        <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:8px">
+          <div style="flex:1"><div style="font-size:14px;font-weight:700">${s.name}</div><div style="font-size:12px;color:var(--muted);margin-top:2px">${s.flag} ${s.country} · ${s.provider}</div></div>
+          <span class="badge ${s.coverage==='Full'?'b-green':'b-gold'}">${s.coverage}</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div style="font-size:12px;color:var(--muted)">⏰ ${s.deadline}</div>
+          <button onclick="openSch('${s.id}')" style="background:rgba(108,99,255,.12);border:none;border-radius:8px;padding:6px 12px;font-size:12px;font-weight:700;color:var(--purple);cursor:pointer;font-family:'Outfit',sans-serif">View Details →</button>
+        </div>
+      </div>`).join('')}
+    ${locked.length&&ST.tier!=='premium'?`
+      <div style="background:linear-gradient(135deg,rgba(255,184,0,.12),rgba(108,99,255,.08));border:1px solid rgba(255,184,0,.2);border-radius:var(--r);padding:14px;display:flex;align-items:center;gap:12px;cursor:pointer" onclick="showPaywall()">
+        <span style="font-size:24px">🔒</span>
+        <div>
+          <div style="font-size:13px;font-weight:700;color:var(--gold)">${locked.length} more scholarships — Premium only</div>
+          <div style="font-size:11px;color:var(--muted)">Includes Gates Cambridge, DAAD & more</div>
+        </div>
+      </div>`:''}
+    <div style="height:16px"></div>
+  `;
+}
+function openSch(id){
+  const s=DATA.scholarships.find(x=>x.id===id);
+  if(!s) return;
+  document.getElementById('modal-sch-body').innerHTML=`
+    <div class="modal-handle"></div>
+    <button onclick="closeModal('modal-sch')" style="background:none;border:none;cursor:pointer;color:var(--muted);font-size:20px;margin-bottom:14px">✕</button>
+    <div style="display:flex;gap:8px;margin-bottom:12px"><span class="badge ${s.coverage==='Full'?'b-green':'b-gold'}">${s.coverage}</span><span class="badge b-orange">⏰ ${s.deadline}</span></div>
+    <div style="font-size:20px;font-weight:800;margin-bottom:4px">${s.name}</div>
+    <div style="font-size:13px;color:var(--muted);margin-bottom:16px">${s.flag} ${s.country} · ${s.provider}</div>
+    <div class="sec-label">Requirements</div>
+    <div class="card">${s.req.map(r=>`<div style="display:flex;gap:8px;padding:7px 0;border-bottom:1px solid var(--border);font-size:13px"><span style="color:var(--green)">✓</span><span>${r}</span></div>`).join('')}</div>
+    <div class="sec-label">Required Documents</div>
+    <div class="card">${s.docs.map(d=>`<div style="display:flex;gap:8px;padding:7px 0;border-bottom:1px solid var(--border);font-size:13px"><span>📄</span><span>${d}</span></div>`).join('')}</div>
+    <div class="sec-label">How to Apply</div>
+    <div class="card" style="margin-bottom:16px"><div style="font-size:13px;color:var(--muted);line-height:1.6">${s.apply}</div></div>
+    <button class="btn btn-primary" onclick="closeModal('modal-sch')">Apply Now →</button>
+  `;
+  document.getElementById('modal-sch').classList.add('open');
+}
+function renderProfile(){
+  const xpInLevel=ST.xp%500;
+  const accuracy=ST.totalQ>0?Math.round(ST.totalC/ST.totalQ*100):94;
+  const savedUnis=DATA.universities.filter(u=>ST.savedUnis.includes(u.id));
+  const achs=[
+    {id:'streak_7',icon:'🔥',name:'7-Day Streak',earned:ST.streak>=7},
+    {id:'xp_1000',icon:'⚡',name:'XP Hunter',earned:ST.xp>=1000},
+    {id:'sharp',icon:'🎯',name:'Sharpshooter',earned:accuracy>=90},
+    {id:'book',icon:'📚',name:'Bookworm',earned:ST.totalQ>=20},
+    {id:'diamond',icon:'💎',name:'Diamond',earned:ST.xp>=5000},
+    {id:'top10',icon:'🏆',name:'Top 10',earned:false},
+    {id:'world',icon:'🌍',name:'World Scholar',earned:savedUnis.length>=3},
+    {id:'admit',icon:'🎓',name:'Admitted!',earned:false},
+  ];
+  document.getElementById('tab-profile').innerHTML=`
+    <div style="text-align:center;padding:20px 0 16px">
+      <div style="width:72px;height:72px;border-radius:36px;background:linear-gradient(135deg,#6C63FF,#FF6B9D);display:flex;align-items:center;justify-content:center;margin:0 auto 10px;font-size:28px;font-weight:800;color:#fff">${(ST.name||'A')[0].toUpperCase()}</div>
+      <div style="font-size:22px;font-weight:800">${ST.name||'Scholar'}</div>
+      <div style="font-size:13px;color:var(--muted);margin-bottom:10px">Indonesia 🇮🇩</div>
+      <div style="display:inline-flex;align-items:center;gap:6px;background:rgba(255,184,0,.15);border:1px solid rgba(255,184,0,.3);border-radius:20px;padding:6px 14px;font-size:13px;font-weight:700;color:var(--gold)">🏅 Scholar · Level ${ST.level}</div>
+      ${ST.tier==='premium'?'<div style="margin-top:8px;background:rgba(255,184,0,.1);border-radius:20px;padding:5px 14px;display:inline-block;font-size:12px;font-weight:700;color:var(--gold)">⭐ Premium Member</div>':''}
+    </div>
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:5px"><span>${xpInLevel}/500 XP to Level ${ST.level+1}</span></div>
+      <div class="pbar" style="height:7px"><div class="pfill p-purple" style="width:${Math.round(xpInLevel/5)}%"></div></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px;margin-bottom:16px">
+      <div class="stat-box"><div class="stat-val" style="color:var(--purple);font-size:16px">${ST.xp.toLocaleString()}</div><div class="stat-lbl">Total XP</div></div>
+      <div class="stat-box"><div class="stat-val" style="color:var(--gold);font-size:16px">🔥${ST.streak}</div><div class="stat-lbl">Streak</div></div>
+      <div class="stat-box"><div class="stat-val" style="color:var(--green);font-size:16px">${accuracy}%</div><div class="stat-lbl">Accuracy</div></div>
+      <div class="stat-box"><div class="stat-val" style="color:var(--blue);font-size:16px">${ST.totalQ}</div><div class="stat-lbl">Questions</div></div>
+    </div>
+    ${ST.selectedTests.length?`
+      <div class="sec-label">Test Progress</div>
+      <div class="card">
+        ${ST.selectedTests.map((cat,i)=>{
+          const r=ST.placementResults[cat];
+          const plan=ST.studyPlans[cat];
+          const pct=r?Math.round(r.acc*100):0;
+          const catColors={IELTS:'#6C63FF',TOEFL:'#00E096',SAT:'#38BDF8',ACT:'#FF8C42',HSK:'#FF6B9D'};
+          return `<div style="${i>0?'margin-top:12px;padding-top:12px;border-top:1px solid var(--border)':''}">
+            <div style="display:flex;justify-content:space-between;margin-bottom:5px;font-size:13px"><span style="font-weight:600">${cat}</span><span style="color:${catColors[cat]}">${r?r.score:'Not taken'}${plan?' → '+plan.label:''}</span></div>
+            <div class="pbar" style="height:5px"><div class="pfill p-purple" style="width:${pct}%"></div></div>
+          </div>`;
+        }).join('')}
+      </div>`:''}
+    <div class="sec-label">Achievements</div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px">
+      ${achs.map(a=>`<div style="background:var(--card);border:1px solid ${a.earned?'rgba(255,184,0,.3)':'var(--border)'};border-radius:var(--rs);padding:10px;text-align:center;${a.earned?'background:rgba(255,184,0,.05)':''}">
+        <div style="font-size:22px;margin-bottom:3px;opacity:${a.earned?1:.25}">${a.icon}</div>
+        <div style="font-size:9px;${a.earned?'color:var(--gold)':'color:var(--muted)'}">${a.name}</div>
+      </div>`).join('')}
+    </div>
+    ${savedUnis.length?`
+      <div class="sec-label">Saved Universities</div>
+      ${savedUnis.map(u=>`<div style="display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--border);border-radius:var(--rs);padding:12px;margin-bottom:8px"><span style="font-size:20px">${u.flag}</span><div style="flex:1"><div style="font-size:13px;font-weight:600">${u.name}</div><div style="font-size:11px;color:var(--muted)">#${u.rank} QS · ${u.country}</div></div><span class="badge b-purple">${u.accept}</span></div>`).join('')}`:''}
+    ${ST.tier==='free'?`
+      <div style="background:linear-gradient(135deg,rgba(255,184,0,.15),rgba(108,99,255,.12));border:1px solid rgba(255,184,0,.2);border-radius:var(--r);padding:14px;display:flex;align-items:center;gap:12px;cursor:pointer;margin-top:8px" onclick="showPaywall()">
+        <span style="font-size:24px">⭐</span>
+        <div style="flex:1"><div style="font-size:14px;font-weight:700">Go Premium</div><div style="font-size:12px;color:var(--muted)">Unlock explanations, full analytics & more</div></div>
+        <span style="color:var(--gold);font-size:18px">›</span>
+      </div>`:''}
+    <div style="height:24px"></div>
+  `;
+}
+function openAptitude(){
+  aptIdx=0;aptAnswers=[];
+  openTab('tab-aptitude');
+  document.getElementById('nb-home').classList.add('active');
+  renderAptQ();
+}
+function renderAptQ(){
+  const q=DATA.aptQs[aptIdx];
+  document.getElementById('apt-qnum').textContent=(aptIdx+1)+'/10';
+  document.getElementById('apt-prog').style.width=(aptIdx/10*100)+'%';
+  document.getElementById('apt-body').innerHTML=`
+    <div style="font-size:17px;font-weight:700;line-height:1.5;margin-bottom:22px">${q.q}</div>
+    <div class="apt-grid">
+      ${q.opts.map((o,i)=>`<button class="apt-opt" id="ao-${i}" onclick="selectApt(${i})">${o}</button>`).join('')}
+    </div>
+  `;
+}
+function selectApt(i){
+  document.querySelectorAll('.apt-opt').forEach(el=>el.classList.remove('sel'));
+  document.getElementById('ao-'+i).classList.add('sel');
+  aptAnswers.push(i);
+  setTimeout(()=>{
+    aptIdx++;
+    if(aptIdx>=DATA.aptQs.length) showAptResult();
+    else renderAptQ();
+  },350);
+}
+function showAptResult(){
+  document.getElementById('apt-prog').style.width='100%';
+  document.getElementById('apt-qnum').textContent='Results';
+  const majors=[
+    {name:'Computer Science & AI',match:92,color:'#6C63FF',strengths:[['Logical Thinking',90],['Problem Solving',85],['Mathematics',78]],unis:['mit','nus','stanford']},
+    {name:'Data Science & Analytics',match:85,color:'#38BDF8',strengths:[['Analytical Thinking',88],['Statistics',82],['Research',75]],unis:['stanford','nus','delft']},
+    {name:'Business & Entrepreneurship',match:78,color:'#FF8C42',strengths:[['Leadership',80],['Communication',85],['Strategy',75]],unis:['mit','oxford','cambridge']},
+  ];
+  document.getElementById('apt-body').innerHTML=`
+    <div style="text-align:center;margin-bottom:20px"><div style="font-size:40px;margin-bottom:6px">🧭</div><div style="font-size:22px;font-weight:800;margin-bottom:4px">Your Major Matches</div><div style="font-size:13px;color:var(--muted)">Based on your interests & strengths</div></div>
+    ${majors.map(m=>{
+      const unis=DATA.universities.filter(u=>m.unis.includes(u.id));
+      return `<div class="card" style="border-color:${m.color}30;margin-bottom:12px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+          <div style="flex:1"><div style="font-size:15px;font-weight:800">${m.name}</div></div>
+          <div style="background:${m.color}20;border:1px solid ${m.color}40;border-radius:8px;padding:8px;text-align:center;margin-left:10px">
+            <div style="font-size:18px;font-weight:800;color:${m.color}">${m.match}%</div>
+            <div style="font-size:9px;color:${m.color}">match</div>
+          </div>
+        </div>
+        ${m.strengths.map(([s,v])=>`<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px"><div style="font-size:11px;color:var(--muted);width:110px">${s}</div><div style="flex:1;background:rgba(255,255,255,.06);border-radius:20px;height:4px;overflow:hidden"><div style="width:${v}%;height:100%;background:${m.color};border-radius:20px"></div></div><div style="font-size:10px;color:var(--muted);width:25px">${v}%</div></div>`).join('')}
+        <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border)">
+          <div style="font-size:10px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px">Suggested Universities</div>
+          ${unis.map(u=>`<div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--border)"><span style="font-size:16px">${u.flag}</span><div style="flex:1;font-size:12px;font-weight:600">${u.name}</div><span style="font-size:11px;color:var(--muted)">#${u.rank}</span></div>`).join('')}
+        </div>
+      </div>`;
+    }).join('')}
+    <button class="btn btn-outline" onclick="closeTab('tab-aptitude')">Back to Home</button>
+    <div style="height:24px"></div>
+  `;
+}
+</script>
